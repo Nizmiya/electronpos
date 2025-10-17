@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1>POS System</h1>
+                    <p>Point of Sale Terminal</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="cashier@pos.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" value="cashier123" required>
+                    </div>
+                    <button type="submit" id="login-btn">Login</button>
+                    <div id="login-error" class="error-message"></div>
+                </form>
+                <div class="login-footer">
+                    <p>Default: cashier@pos.com / cashier123</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main POS Screen -->
+        <div id="pos-screen" class="screen">
+            <div class="pos-header">
+                <div class="header-left">
+                    <h1>POS System</h1>
+                    <span id="cashier-name">Cashier: Loading...</span>
+                </div>
+                <div class="header-right">
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+
+            <div class="pos-container">
+                <!-- Product Selection Panel -->
+                <div class="product-panel">
+                    <div class="search-bar">
+                        <input type="text" id="product-search" placeholder="Search products...">
+                        <button id="search-btn">Search</button>
+                    </div>
+                    
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="all">All</button>
+                        <button class="category-btn" data-category="food">Food</button>
+                        <button class="category-btn" data-category="beverages">Beverages</button>
+                        <button class="category-btn" data-category="snacks">Snacks</button>
+                        <button class="category-btn" data-category="other">Other</button>
+                    </div>
+
+                    <div id="products-grid" class="products-grid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Cart and Checkout Panel -->
+                <div class="cart-panel">
+                    <div class="cart-header">
+                        <h2>Current Sale</h2>
+                        <button id="clear-cart-btn" class="btn-danger">Clear</button>
+                    </div>
+
+                    <div id="cart-items" class="cart-items">
+                        <!-- Cart items will be displayed here -->
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (10%):</span>
+                            <span id="tax">$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="payment-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <button class="payment-btn" data-method="cash">Cash</button>
+                            <button class="payment-btn" data-method="card">Card</button>
+                            <button class="payment-btn" data-method="upi">UPI</button>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <button id="checkout-btn" class="btn-primary" disabled>
+                            Process Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Screen -->
+        <div id="receipt-screen" class="screen">
+            <div class="receipt-container">
+                <div class="receipt-header">
+                    <h2>Receipt</h2>
+                    <p>Order #<span id="receipt-order-number"></span></p>
+                    <p>Date: <span id="receipt-date"></span></p>
+                </div>
+                
+                <div id="receipt-items" class="receipt-items">
+                    <!-- Receipt items will be displayed here -->
+                </div>
+
+                <div class="receipt-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="receipt-subtotal"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax:</span>
+                        <span id="receipt-tax"></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="receipt-total"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Payment Method:</span>
+                        <span id="receipt-payment"></span>
+                    </div>
+                </div>
+
+                <div class="receipt-footer">
+                    <p>Thank you for your business!</p>
+                    <button id="new-sale-btn" class="btn-primary">New Sale</button>
+                    <button id="print-receipt-btn" class="btn-secondary">Print Receipt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
