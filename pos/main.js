@@ -132,11 +132,7 @@ Menu.setApplicationMenu(menu);
 // IPC handlers for API communication
 ipcMain.handle('api-request', async (event, { method, url, data, headers = {} }) => {
   try {
-    const token = store.get('authToken');
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
+    // No authentication needed - direct API calls
     const response = await axios({
       method,
       url: `${API_BASE_URL}${url}`,
@@ -153,56 +149,11 @@ ipcMain.handle('api-request', async (event, { method, url, data, headers = {} })
   }
 });
 
-// IPC handlers for authentication
-ipcMain.handle('login', async (event, { email, password }) => {
-  try {
-    console.log('Attempting login for:', email);
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-      email,
-      password
-    });
+// Login handler removed - no authentication needed
 
-    console.log('Login response status:', response.status);
-    console.log('Login response data:', response.data);
-    
-    if (response.status === 200 && response.data.message === 'Login successful') {
-      const { token, user } = response.data;
-      store.set('authToken', token);
-      store.set('user', user);
+// Logout handler removed - no logout needed
 
-      console.log('Login successful, user stored:', user);
-      console.log('Returning success to frontend');
-      return { success: true, user };
-    } else {
-      console.log('Login failed - unexpected response format');
-      return {
-        success: false,
-        error: { message: 'Unexpected response format' }
-      };
-    }
-  } catch (error) {
-    console.error('Login error:', error.response?.data || error.message);
-    console.error('Error status:', error.response?.status);
-    console.error('Error details:', error);
-    return {
-      success: false,
-      error: error.response?.data || { message: 'Login failed' }
-    };
-  }
-});
-
-ipcMain.handle('logout', () => {
-  store.delete('authToken');
-  store.delete('user');
-});
-
-ipcMain.handle('get-stored-user', () => {
-  return store.get('user');
-});
-
-ipcMain.handle('get-stored-token', () => {
-  return store.get('authToken');
-});
+// Stored authentication handlers removed - no authentication needed
 
 // IPC handlers for printing
 ipcMain.handle('print-receipt', async (event, receiptData) => {

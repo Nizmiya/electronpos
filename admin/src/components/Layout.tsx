@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
 import { 
   Menu, 
   LayoutDashboard, 
@@ -51,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
-            <h1 className="text-xl font-semibold text-gray-900">POS Admin</h1>
+            <h1 className="text-xl font-semibold text-gray-900">NZ Mart Admin</h1>
           </div>
           
           <div className="flex items-center space-x-4">

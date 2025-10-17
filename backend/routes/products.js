@@ -5,13 +5,13 @@ const { auth, adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Get all products
+// Get all products (public access)
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, category, search } = req.query;
     const query = { isActive: true };
     
-    if (category) query.category = category;
+    if (category && category !== 'All') query.category = category;
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
     }
 
     const products = await Product.find(query)
-      .populate('createdBy', 'username')
+      .select('-createdBy') // Don't include createdBy for public access
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -36,6 +36,17 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Get products error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get all categories (public access)
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await Product.distinct('category', { isActive: true });
+    res.json(categories || []);
+  } catch (error) {
+    console.error('Get categories error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

@@ -1,6 +1,6 @@
-# POS System - Complete Point of Sale Solution
+# NZ Mart - Complete Retail Solution
 
-A comprehensive Point of Sale (POS) system built with Electron.js for the POS terminal and React.js for the admin panel, with a Node.js backend API.
+A comprehensive retail solution featuring a Point of Sale (POS) system, admin panel, and public website for NZ Mart retail store. Built with Electron.js for the POS terminal, React.js for the admin panel and public website, with a Node.js backend API.
 
 ## 🚀 Features
 

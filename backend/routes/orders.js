@@ -68,9 +68,8 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// Create order
+// Create order (no authentication required for POS)
 router.post('/', [
-  auth,
   body('items').isArray({ min: 1 }),
   body('items.*.product').isMongoId(),
   body('items.*.quantity').isInt({ min: 1 }),
@@ -122,7 +121,7 @@ router.post('/', [
       paymentMethod,
       paymentStatus: 'completed',
       status: 'completed',
-      cashier: req.user._id,
+      cashier: req.user ? req.user._id : null, // Handle no authentication
       customerInfo
     });
 

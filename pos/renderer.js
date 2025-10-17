@@ -8,12 +8,12 @@ let selectedPaymentMethod = null;
 let currentOrder = null;
 
 // DOM elements
-const loginScreen = document.getElementById('login-screen');
+// const loginScreen = document.getElementById('login-screen'); // Removed - no login needed
 const posScreen = document.getElementById('pos-screen');
 const receiptScreen = document.getElementById('receipt-screen');
-const loginForm = document.getElementById('login-form');
-const loginError = document.getElementById('login-error');
-const logoutBtn = document.getElementById('logout-btn');
+// const loginForm = document.getElementById('login-form'); // Removed - no login needed
+// const loginError = document.getElementById('login-error'); // Removed - no login needed
+// const logoutBtn = document.getElementById('logout-btn'); // Removed - no logout needed
 const cashierName = document.getElementById('cashier-name');
 const productSearch = document.getElementById('product-search');
 const searchBtn = document.getElementById('search-btn');
@@ -29,41 +29,31 @@ const checkoutBtn = document.getElementById('checkout-btn');
 const newSaleBtn = document.getElementById('new-sale-btn');
 const printReceiptBtn = document.getElementById('print-receipt-btn');
 
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Frontend: DOM loaded, initializing app');
     
     // Check if all required elements exist
     console.log('Frontend: Checking DOM elements...');
-    console.log('Frontend: loginScreen:', loginScreen);
     console.log('Frontend: posScreen:', posScreen);
-    console.log('Frontend: loginForm:', loginForm);
     console.log('Frontend: cashierName:', cashierName);
     
-    await checkStoredAuth();
+    // Skip login and go directly to POS screen
+    currentUser = { username: 'POS User', role: 'cashier' };
+    showPOSScreen();
     setupEventListeners();
-    console.log('Frontend: App initialized');
+    await loadProducts();
+    console.log('Frontend: App initialized - Direct POS access');
 });
 
-// Check for stored authentication
-async function checkStoredAuth() {
-    const token = await ipcRenderer.invoke('get-stored-token');
-    const user = await ipcRenderer.invoke('get-stored-user');
-    
-    if (token && user) {
-        currentUser = user;
-        showPOSScreen();
-        await loadProducts();
-    }
-}
+// Check for stored authentication - removed since we don't need login
 
 // Setup event listeners
 function setupEventListeners() {
-    // Login form
-    loginForm.addEventListener('submit', handleLogin);
+    // Login form - removed since we don't need login
     
-    // Logout
-    logoutBtn.addEventListener('click', handleLogout);
+    // Logout - removed since we don't need login
     
     // Product search
     searchBtn.addEventListener('click', handleSearch);
@@ -83,13 +73,19 @@ function setupEventListeners() {
     // Cart management
     clearCartBtn.addEventListener('click', clearCart);
     
-    // Payment methods
+    // Payment methods - Auto-select card payment
     paymentBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             paymentBtns.forEach(b => b.classList.remove('selected'));
             e.target.classList.add('selected');
             selectedPaymentMethod = e.target.dataset.method;
-            updateCheckoutButton();
+            
+            // Auto-generate bill when card payment is clicked
+            if (selectedPaymentMethod === 'card' && cart.length > 0) {
+                handleCheckout();
+            } else {
+                updateCheckoutButton();
+            }
         });
     });
     
@@ -101,66 +97,19 @@ function setupEventListeners() {
     printReceiptBtn.addEventListener('click', handlePrintReceipt);
 }
 
-// Handle login
-async function handleLogin(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    
-    console.log('Frontend: Attempting login for:', email);
-    
-    try {
-        const result = await ipcRenderer.invoke('login', { email, password });
-        console.log('Frontend: Login result:', result);
-        
-        if (result.success) {
-            currentUser = result.user;
-            console.log('Frontend: Login successful, showing POS screen');
-            showPOSScreen();
-            await loadProducts();
-        } else {
-            console.error('Frontend: Login failed:', result.error);
-            showLoginError(result.error.message || 'Login failed');
-        }
-    } catch (error) {
-        console.error('Frontend: Login error:', error);
-        showLoginError('Login failed: ' + error.message);
-    }
-}
+// Handle login - removed since we don't need login
 
-// Handle logout
-async function handleLogout() {
-    await ipcRenderer.invoke('logout');
-    currentUser = null;
-    showLoginScreen();
-}
+// Handle logout - removed since we don't need login
 
-// Show login error
-function showLoginError(message) {
-    loginError.textContent = message;
-    loginError.style.display = 'block';
-    setTimeout(() => {
-        loginError.style.display = 'none';
-    }, 5000);
-}
+// Show login error - removed since we don't need login
 
 // Show POS screen
 function showPOSScreen() {
     console.log('Frontend: Showing POS screen');
     console.log('Frontend: Current user:', currentUser);
     
-    console.log('Frontend: Before - loginScreen classes:', loginScreen.className);
-    console.log('Frontend: Before - posScreen classes:', posScreen.className);
-    
-    loginScreen.classList.remove('active');
     posScreen.classList.add('active');
     receiptScreen.classList.remove('active');
-    
-    console.log('Frontend: After - loginScreen classes:', loginScreen.className);
-    console.log('Frontend: After - posScreen classes:', posScreen.className);
-    console.log('Frontend: posScreen style.display:', posScreen.style.display);
-    console.log('Frontend: posScreen computed display:', window.getComputedStyle(posScreen).display);
     
     if (currentUser) {
         cashierName.textContent = `Cashier: ${currentUser.username}`;
@@ -170,16 +119,10 @@ function showPOSScreen() {
     console.log('Frontend: Screen classes updated');
 }
 
-// Show login screen
-function showLoginScreen() {
-    loginScreen.classList.add('active');
-    posScreen.classList.remove('active');
-    receiptScreen.classList.remove('active');
-}
+// Show login screen - removed since we don't need login
 
 // Show receipt screen
 function showReceiptScreen() {
-    loginScreen.classList.remove('active');
     posScreen.classList.remove('active');
     receiptScreen.classList.add('active');
 }
@@ -405,9 +348,15 @@ async function handleCheckout() {
 function showReceipt() {
     if (!currentOrder) return;
     
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    const timeStr = now.toLocaleTimeString();
+    
     // Update receipt elements
     document.getElementById('receipt-order-number').textContent = currentOrder.orderNumber;
-    document.getElementById('receipt-date').textContent = new Date().toLocaleString();
+    document.getElementById('receipt-date').textContent = dateStr;
+    document.getElementById('receipt-time').textContent = timeStr;
+    document.getElementById('receipt-cashier').textContent = currentUser ? currentUser.username : 'Unknown';
     
     // Render receipt items
     const receiptItems = document.getElementById('receipt-items');
@@ -417,8 +366,14 @@ function showReceipt() {
         const receiptItem = document.createElement('div');
         receiptItem.className = 'receipt-item';
         receiptItem.innerHTML = `
-            <span>${item.product.name} x${item.quantity}</span>
-            <span>$${item.subtotal.toFixed(2)}</span>
+            <div class="receipt-item-details">
+                <div class="receipt-item-name">${item.product.name}</div>
+                <div class="receipt-item-info">
+                    <span>Qty: ${item.quantity}</span>
+                    <span>@ $${item.price.toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="receipt-item-total">$${item.subtotal.toFixed(2)}</div>
         `;
         receiptItems.appendChild(receiptItem);
     });
@@ -455,6 +410,7 @@ async function handlePrintReceipt() {
         alert('Failed to print receipt');
     }
 }
+
 
 // Make functions available globally for onclick handlers
 window.updateCartQuantity = updateCartQuantity;

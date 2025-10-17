@@ -9,10 +9,10 @@
 <body>
     <div id="app">
         <!-- Login Screen -->
-        <div id="login-screen" class="screen active">
+        <div id="login-screen" class="screen">
             <div class="login-container">
                 <div class="login-header">
-                    <h1>POS System</h1>
+                    <h1>NZ Mart POS</h1>
                     <p>Point of Sale Terminal</p>
                 </div>
                 <form id="login-form">
@@ -34,14 +34,14 @@
         </div>
 
         <!-- Main POS Screen -->
-        <div id="pos-screen" class="screen">
+        <div id="pos-screen" class="screen active">
             <div class="pos-header">
                 <div class="header-left">
-                    <h1>POS System</h1>
+                    <h1>NZ Mart POS</h1>
                     <span id="cashier-name">Cashier: Loading...</span>
                 </div>
                 <div class="header-right">
-                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                    <span class="text-sm text-gray-600">NZ Mart POS System</span>
                 </div>
             </div>
 
@@ -92,12 +92,11 @@
                         </div>
                     </div>
 
+
                     <div class="payment-section">
                         <h3>Payment Method</h3>
                         <div class="payment-methods">
-                            <button class="payment-btn" data-method="cash">Cash</button>
-                            <button class="payment-btn" data-method="card">Card</button>
-                            <button class="payment-btn" data-method="upi">UPI</button>
+                            <button class="payment-btn card-payment" data-method="card">💳 Card Payment</button>
                         </div>
                     </div>
 
@@ -114,9 +113,15 @@
         <div id="receipt-screen" class="screen">
             <div class="receipt-container">
                 <div class="receipt-header">
-                    <h2>Receipt</h2>
+                    <h2>NZ Mart</h2>
+                    <p>123 Galle Road, Colombo 03</p>
+                    <p>Phone: +94 11 123 4567</p>
+                    <hr>
                     <p>Order #<span id="receipt-order-number"></span></p>
                     <p>Date: <span id="receipt-date"></span></p>
+                    <p>Time: <span id="receipt-time"></span></p>
+                    <p>Cashier: <span id="receipt-cashier"></span></p>
+                    <hr>
                 </div>
                 
                 <div id="receipt-items" class="receipt-items">
@@ -124,12 +129,13 @@
                 </div>
 
                 <div class="receipt-summary">
+                    <hr>
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="receipt-subtotal"></span>
                     </div>
                     <div class="summary-row">
-                        <span>Tax:</span>
+                        <span>Tax (10%):</span>
                         <span id="receipt-tax"></span>
                     </div>
                     <div class="summary-row total">
@@ -140,10 +146,14 @@
                         <span>Payment Method:</span>
                         <span id="receipt-payment"></span>
                     </div>
+                    <hr>
+                    <div class="receipt-footer">
+                        <p>Thank you for shopping at NZ Mart!</p>
+                        <p>Visit our website: www.nzmart.lk</p>
+                    </div>
                 </div>
 
-                <div class="receipt-footer">
-                    <p>Thank you for your business!</p>
+                <div class="receipt-actions">
                     <button id="new-sale-btn" class="btn-primary">New Sale</button>
                     <button id="print-receipt-btn" class="btn-secondary">Print Receipt</button>
                 </div>

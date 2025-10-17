@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { useAuth } from '../contexts/AuthContext';
 
 const AddProduct: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -13,6 +15,8 @@ const AddProduct: React.FC = () => {
     stock: '',
     barcode: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -21,11 +25,43 @@ const AddProduct: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement product creation
-    console.log('Add product:', formData);
-    navigate('/products');
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          category: formData.category,
+          stock: parseInt(formData.stock) || 0,
+          barcode: formData.barcode,
+          isActive: true
+        })
+      });
+
+      if (response.ok) {
+        const newProduct = await response.json();
+        console.log('Product created successfully:', newProduct);
+        navigate('/products');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to create product');
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      setError('Error creating product');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,6 +76,11 @@ const AddProduct: React.FC = () => {
           <CardTitle>Product Information</CardTitle>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+              <p className="text-red-600">{error}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -142,11 +183,12 @@ const AddProduct: React.FC = () => {
                 type="button"
                 variant="outline"
                 onClick={() => navigate('/products')}
+                disabled={loading}
               >
                 Cancel
               </Button>
-              <Button type="submit">
-                Add Product
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Adding Product...' : 'Add Product'}
               </Button>
             </div>
           </form>

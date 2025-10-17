@@ -4,16 +4,30 @@
   "description": "Complete POS System with Electron POS and React Admin Panel",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run backend\" \"npm run admin\" \"npm run pos\"",
+    "start": "concurrently \"npm run backend\" \"npm run admin\" \"npm run pos\" \"npm run public\"",
     "backend": "cd backend && npm start",
     "admin": "cd admin && npm start",
     "pos": "cd pos && npm start",
-    "install-all": "npm install && cd backend && npm install && cd ../admin && npm install && cd ../pos && npm install"
+    "public": "cd public-website && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../admin && npm install && cd ../pos && npm install && cd ../public-website && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
-  "keywords": ["pos", "electron", "react", "nodejs"],
+  "keywords": [
+    "pos",
+    "electron",
+    "react",
+    "nodejs"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "axios": "^1.12.2",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.546.0",
+    "react-router-dom": "^7.9.4",
+    "tailwindcss": "^4.1.14"
+  }
 }

@@ -352,6 +352,7 @@ body {
     margin-bottom: 1rem;
 }
 
+
 .summary-row {
     display: flex;
     justify-content: space-between;
@@ -459,7 +460,35 @@ body {
 .receipt-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px dotted #ccc;
+}
+
+.receipt-item-details {
+    flex: 1;
+    text-align: left;
+}
+
+.receipt-item-name {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+    color: #333;
+}
+
+.receipt-item-info {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    gap: 1rem;
+}
+
+.receipt-item-total {
+    font-weight: bold;
+    color: #333;
+    min-width: 60px;
+    text-align: right;
 }
 
 .receipt-summary {
@@ -475,12 +504,20 @@ body {
     font-style: italic;
 }
 
-.receipt-footer button {
+.receipt-footer button,
+.receipt-actions button {
     margin: 0 0.5rem;
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.receipt-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 }
 
 /* Loading states */
