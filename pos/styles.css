@@ -11,6 +11,8 @@ body {
     color: #333;
     height: 100vh;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 /* Screen management */
@@ -168,10 +170,18 @@ body {
 
 .search-bar input {
     flex: 1;
-    padding: 0.75rem;
-    border: 2px solid #ddd;
-    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
     font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-bar button {
@@ -179,8 +189,66 @@ body {
     background: #667eea;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.search-bar button:hover {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+}
+
+.search-bar button.clear-search {
+    background: #dc3545;
+}
+
+.search-bar button.clear-search:hover {
+    background: #c82333;
+}
+
+/* Search highlighting */
+mark {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* No results styling */
+.no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.no-results-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.no-results-text {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.no-results-hint {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Product category styling */
+.product-category {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+    text-transform: capitalize;
 }
 
 .category-filter {
@@ -428,15 +496,22 @@ body {
     align-items: center;
     justify-content: center;
     background: white;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
 }
 
 .receipt-container {
     background: white;
     border: 2px solid #333;
-    padding: 2rem;
+    padding: 1.5rem;
     max-width: 400px;
     width: 90vw;
+    height: 95vh;
     text-align: center;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .receipt-header h2 {
@@ -455,6 +530,29 @@ body {
     border-top: 1px solid #333;
     border-bottom: 1px solid #333;
     padding: 1rem 0;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 200px;
+    max-height: 50vh;
+}
+
+/* Custom scrollbar for receipt items */
+.receipt-items::-webkit-scrollbar {
+    width: 8px;
+}
+
+.receipt-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.receipt-items::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.receipt-items::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .receipt-item {
@@ -475,6 +573,7 @@ body {
     font-weight: bold;
     margin-bottom: 0.2rem;
     color: #333;
+    font-size: 1rem;
 }
 
 .receipt-item-info {
@@ -489,14 +588,17 @@ body {
     color: #333;
     min-width: 60px;
     text-align: right;
+    font-size: 1rem;
 }
 
 .receipt-summary {
-    margin: 1rem 0;
+    margin: 0.5rem 0;
+    flex-shrink: 0;
 }
 
 .receipt-footer {
-    margin-top: 2rem;
+    margin-top: 1rem;
+    flex-shrink: 0;
 }
 
 .receipt-footer p {

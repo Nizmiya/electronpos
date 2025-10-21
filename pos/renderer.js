@@ -55,11 +55,21 @@ function setupEventListeners() {
     
     // Logout - removed since we don't need login
     
-    // Product search
-    searchBtn.addEventListener('click', handleSearch);
+    // Product search - Real-time search on key press
+    searchBtn.addEventListener('click', () => {
+        if (productSearch.value.trim()) {
+            clearSearch();
+        } else {
+            handleSearch();
+        }
+    });
+    
     productSearch.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleSearch();
     });
+    
+    // Real-time search on every key press
+    productSearch.addEventListener('input', handleSearch);
     
     // Category filters
     categoryBtns.forEach(btn => {
@@ -146,22 +156,41 @@ async function loadProducts() {
     }
 }
 
-// Render products
-function renderProducts(filteredProducts = products) {
+// Render products with search highlighting
+function renderProducts(filteredProducts = products, searchTerm = '') {
     productsGrid.innerHTML = '';
     
     if (filteredProducts.length === 0) {
-        productsGrid.innerHTML = '<div class="loading">No products found</div>';
+        if (searchTerm) {
+            productsGrid.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <div class="no-results-text">No products found for "${searchTerm}"</div>
+                    <div class="no-results-hint">Try a different search term</div>
+                </div>
+            `;
+        } else {
+            productsGrid.innerHTML = '<div class="loading">No products found</div>';
+        }
         return;
     }
     
     filteredProducts.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = `product-card ${product.stock === 0 ? 'out-of-stock' : ''}`;
+        
+        // Highlight search term in product name
+        let highlightedName = product.name;
+        if (searchTerm) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            highlightedName = product.name.replace(regex, '<mark>$1</mark>');
+        }
+        
         productCard.innerHTML = `
-            <h3>${product.name}</h3>
+            <h3>${highlightedName}</h3>
             <div class="product-price">$${product.price.toFixed(2)}</div>
             <div class="product-stock">Stock: ${product.stock}</div>
+            ${product.category ? `<div class="product-category">${product.category}</div>` : ''}
         `;
         
         if (product.stock > 0) {
@@ -184,20 +213,52 @@ function filterProductsByCategory(category) {
     }
 }
 
-// Handle search
+// Handle search - Enhanced with real-time functionality
 function handleSearch() {
-    const searchTerm = productSearch.value.toLowerCase();
-    if (!searchTerm) {
-        renderProducts();
-        return;
+    const searchTerm = productSearch.value.toLowerCase().trim();
+    
+    // Clear any existing search timeout
+    if (window.searchTimeout) {
+        clearTimeout(window.searchTimeout);
     }
     
-    const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.description?.toLowerCase().includes(searchTerm)
-    );
-    
-    renderProducts(filtered);
+    // Add small delay for better performance on rapid typing
+    window.searchTimeout = setTimeout(() => {
+        if (!searchTerm) {
+            // Reset to show all products when search is cleared
+            renderProducts();
+            return;
+        }
+        
+        // Enhanced search - search in name, description, and category
+        const filtered = products.filter(product =>
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.description?.toLowerCase().includes(searchTerm) ||
+            product.category?.toLowerCase().includes(searchTerm) ||
+            product.barcode?.toLowerCase().includes(searchTerm)
+        );
+        
+        // Show search results with highlighting
+        renderProducts(filtered, searchTerm);
+        
+        // Update search button state
+        if (searchTerm) {
+            searchBtn.textContent = 'Clear';
+            searchBtn.classList.add('clear-search');
+        } else {
+            searchBtn.textContent = 'Search';
+            searchBtn.classList.remove('clear-search');
+        }
+    }, 150); // 150ms delay for better performance
+}
+
+// Clear search function
+function clearSearch() {
+    productSearch.value = '';
+    productSearch.focus();
+    renderProducts();
+    searchBtn.textContent = 'Search';
+    searchBtn.classList.remove('clear-search');
 }
 
 // Add product to cart

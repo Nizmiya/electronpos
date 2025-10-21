@@ -108,58 +108,62 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-          <p className="text-gray-600">View and manage customer orders from POS system</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Orders
+          </h1>
+          <p className="text-gray-600 text-lg">View and manage customer orders from POS system</p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-3">
           <button
             onClick={() => setViewMode('table')}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
               viewMode === 'table' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
             }`}
           >
-            <Table className="h-4 w-4 inline mr-1" />
-            Table
+            <Table className="h-4 w-4 inline mr-2" />
+            Table View
           </button>
           <button
             onClick={() => setViewMode('card')}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
               viewMode === 'card' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
             }`}
           >
-            <List className="h-4 w-4 inline mr-1" />
-            Cards
+            <List className="h-4 w-4 inline mr-2" />
+            Card View
           </button>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Receipt className="h-5 w-5 mr-2" />
+      <Card className="bg-gradient-to-br from-white to-gray-50 border border-gray-300 shadow-xl">
+        <CardHeader className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-t-lg">
+          <CardTitle className="flex items-center text-white">
+            <Receipt className="h-6 w-6 mr-3" />
             Order History ({orders.length} orders)
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {orders.length === 0 ? (
-            <div className="text-center py-8">
-              <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No orders yet</p>
-              <p className="text-sm text-gray-500 mt-2">
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Receipt className="h-10 w-10 text-indigo-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No orders yet</h3>
+              <p className="text-gray-600 mb-4">
                 Orders will appear here once customers make purchases through the POS system.
               </p>
             </div>
           ) : viewMode === 'table' ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
+                <thead className="bg-gray-100">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Serial
@@ -187,7 +191,7 @@ const Orders: React.FC = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-300">
                   {orders.map((order, orderIndex) => (
                     <tr key={order._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -225,69 +229,74 @@ const Orders: React.FC = () => {
               </table>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="p-6 space-y-6">
               {orders.map((order, orderIndex) => (
-                <div key={order._id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
+                <div key={order._id} className="bg-gradient-to-br from-white to-gray-50 border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-semibold text-lg">
+                      <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">
                         Order #{order.orderNumber}
                       </h3>
-                      <p className="text-sm text-gray-600">Serial: {orderIndex + 1} | ID: {order._id}</p>
+                      <p className="text-sm text-gray-500 mt-1">Serial: {orderIndex + 1} | ID: {order._id}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusColor(order.status)}`}>
                         {order.status.toUpperCase()}
                       </span>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-gray-600 mt-2">
                         {formatDate(order.createdAt)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <User className="h-4 w-4 mr-2" />
-                      Cashier: {order.cashier ? order.cashier.username : 'POS System'}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                      <User className="h-4 w-4 mr-2 text-blue-500" />
+                      <span className="font-medium">Cashier: {order.cashier ? order.cashier.username : 'POS System'}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-gray-600 bg-green-50 p-3 rounded-lg">
                       {getPaymentIcon(order.paymentMethod)}
-                      <span className="ml-2">{order.paymentMethod.toUpperCase()}</span>
+                      <span className="ml-2 font-medium">{order.paymentMethod.toUpperCase()}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Package className="h-4 w-4 mr-2" />
-                      {order.items.length} item(s)
+                    <div className="flex items-center text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
+                      <Package className="h-4 w-4 mr-2 text-purple-500" />
+                      <span className="font-medium">{order.items.length} item(s)</span>
                     </div>
                   </div>
 
-                  <div className="border-t pt-3">
+                  <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-4 mb-4">
                     <div className="flex justify-between items-center">
                       <div className="text-sm text-gray-600">
-                        <p>Subtotal: ${order.subtotal.toFixed(2)}</p>
-                        <p>Tax: ${order.tax.toFixed(2)}</p>
+                        <p className="font-medium">Subtotal: <span className="text-green-600 font-bold">${order.subtotal.toFixed(2)}</span></p>
+                        <p className="font-medium">Tax: <span className="text-orange-600 font-bold">${order.tax.toFixed(2)}</span></p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold">Total: ${order.total.toFixed(2)}</p>
+                        <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                          Total: ${order.total.toFixed(2)}
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t">
-                    <h4 className="font-medium text-sm mb-2">Items:</h4>
-                    <div className="space-y-2">
+                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-sm mb-3 text-gray-700 flex items-center">
+                      <Package className="h-4 w-4 mr-2" />
+                      Order Items
+                    </h4>
+                    <div className="space-y-3">
                       {order.items.map((item, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                        <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-300">
                           <div className="flex justify-between items-start">
                             <div>
-                              <p className="font-medium text-sm">
+                              <p className="font-semibold text-sm text-gray-800">
                                 {item.product ? item.product.name : 'Unknown Product'}
                               </p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-gray-500 mt-1">
                                 Quantity: {item.quantity} × ${item.price.toFixed(2)}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="font-semibold text-sm">${item.subtotal.toFixed(2)}</p>
+                              <p className="font-bold text-sm text-green-600">${item.subtotal.toFixed(2)}</p>
                             </div>
                           </div>
                         </div>
