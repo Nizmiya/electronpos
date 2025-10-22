@@ -452,6 +452,22 @@ function showReceipt() {
 function startNewSale() {
     clearCart();
     currentOrder = null;
+    
+    // Clear search field and reset search state
+    productSearch.value = '';
+    searchBtn.textContent = 'Search';
+    searchBtn.classList.remove('clear-search');
+    
+    // Reset category filter to "All"
+    categoryBtns.forEach(btn => btn.classList.remove('active'));
+    const allCategoryBtn = document.querySelector('.category-btn[data-category="all"]');
+    if (allCategoryBtn) {
+        allCategoryBtn.classList.add('active');
+    }
+    
+    // Reset products display to show all products
+    renderProducts();
+    
     showPOSScreen();
 }
 
