@@ -1,7 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const Product = require('../models/Product');
+const { Product, User } = require('../models');
 const { auth, adminAuth } = require('../middleware/auth');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -9,28 +10,40 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, category, search } = req.query;
-    const query = { isActive: true };
+    const where = { isActive: true };
     
-    if (category && category !== 'All') query.category = category;
+    if (category && category !== 'All') where.category = category;
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+      where[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } }
       ];
     }
 
-    const products = await Product.find(query)
-      .select('-createdBy') // Don't include createdBy for public access
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+    const offset = (page - 1) * limit;
+    const products = await Product.findAll({
+      where,
+      attributes: { exclude: ['createdBy'] }, // Don't include createdBy for public access
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
 
-    const total = await Product.countDocuments(query);
+    // Convert price to number for frontend compatibility
+    const processedProducts = products.map(product => {
+      const productData = product.toJSON();
+      return {
+        ...productData,
+        price: parseFloat(productData.price)
+      };
+    });
+
+    const total = await Product.count({ where });
 
     res.json({
-      products,
+      products: processedProducts,
       totalPages: Math.ceil(total / limit),
-      currentPage: page,
+      currentPage: parseInt(page),
       total
     });
   } catch (error) {
@@ -42,8 +55,14 @@ router.get('/', async (req, res) => {
 // Get all categories (public access)
 router.get('/categories', async (req, res) => {
   try {
-    const categories = await Product.distinct('category', { isActive: true });
-    res.json(categories || []);
+    const categories = await Product.findAll({
+      where: { isActive: true },
+      attributes: ['category'],
+      group: ['category'],
+      raw: true
+    });
+    const categoryList = categories.map(cat => cat.category);
+    res.json(categoryList || []);
   } catch (error) {
     console.error('Get categories error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -53,14 +72,25 @@ router.get('/categories', async (req, res) => {
 // Get single product
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate('createdBy', 'username');
+    const product = await Product.findByPk(req.params.id, {
+      include: [{
+        model: User,
+        as: 'creator',
+        attributes: ['username']
+      }]
+    });
     
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    res.json(product);
+    // Convert price to number for frontend compatibility
+    const processedProduct = {
+      ...product.toJSON(),
+      price: parseFloat(product.price)
+    };
+
+    res.json(processedProduct);
   } catch (error) {
     console.error('Get product error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -83,11 +113,10 @@ router.post('/', [
 
     const productData = {
       ...req.body,
-      createdBy: req.user._id
+      createdBy: req.user.id
     };
 
-    const product = new Product(productData);
-    await product.save();
+    const product = await Product.create(productData);
 
     res.status(201).json(product);
   } catch (error) {
@@ -110,16 +139,13 @@ router.put('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
+    const product = await Product.findByPk(req.params.id);
+    
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    await product.update(req.body);
     res.json(product);
   } catch (error) {
     console.error('Update product error:', error);
@@ -130,16 +156,13 @@ router.put('/:id', [
 // Delete product (Admin only)
 router.delete('/:id', adminAuth, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true }
-    );
-
+    const product = await Product.findByPk(req.params.id);
+    
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    await product.update({ isActive: false });
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.error('Delete product error:', error);
@@ -158,16 +181,13 @@ router.patch('/:id/stock', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { stock: req.body.stock },
-      { new: true }
-    );
-
+    const product = await Product.findByPk(req.params.id);
+    
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    await product.update({ stock: req.body.stock });
     res.json(product);
   } catch (error) {
     console.error('Update stock error:', error);

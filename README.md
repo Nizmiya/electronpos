@@ -24,18 +24,18 @@ A comprehensive retail solution featuring a Point of Sale (POS) system, admin pa
 
 - **RESTful API**: Complete CRUD operations for all entities
 - **Authentication**: JWT-based authentication system
-- **Database**: MongoDB integration with Mongoose ODM
+- **Database**: MySQL integration with Sequelize ORM
 - **Real-time Updates**: Live data synchronization between admin and POS
 
 ## 🛠️ Technology Stack
 
 | Component          | Technology                                     |
 | ------------------ | ---------------------------------------------- |
-| **Backend API**    | Node.js, Express.js, MongoDB, Mongoose         |
+| **Backend API**    | Node.js, Express.js, MySQL, Sequelize          |
 | **Admin Panel**    | React.js, TypeScript, Material-UI, React Query |
 | **POS Terminal**   | Electron.js, HTML5, CSS3, JavaScript           |
 | **Authentication** | JWT (JSON Web Tokens)                          |
-| **Database**       | MongoDB                                        |
+| **Database**       | MySQL                                          |
 | **Styling**        | Material-UI, Custom CSS                        |
 
 ## 📋 Prerequisites
@@ -43,7 +43,7 @@ A comprehensive retail solution featuring a Point of Sale (POS) system, admin pa
 Before running this application, make sure you have the following installed:
 
 - **Node.js** (v16 or higher)
-- **MongoDB** (v4.4 or higher)
+- **MySQL** (v8.0 or higher)
 - **npm** (comes with Node.js)
 
 ## 🚀 Quick Start
@@ -65,27 +65,36 @@ npm install
 npm run install-all
 ```
 
-### 3. Setup MongoDB
+### 3. Setup MySQL
 
-Make sure MongoDB is running on your system:
+1. **Create MySQL Database:**
 
-```bash
-# Start MongoDB service
-mongod
-```
+   ```sql
+   CREATE DATABASE pos_system;
+   ```
 
-### 4. Configure Environment
+2. **Configure Environment:**
+   Copy `backend/env.example` to `backend/.env` and update the values:
 
-Create a `.env` file in the `backend` directory:
+   ```env
+   PORT=5000
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_NAME=pos_system
+   DB_USER=root
+   DB_PASSWORD=your_mysql_password
+   JWT_SECRET=your_super_secret_jwt_key_here
+   NODE_ENV=development
+   ```
 
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/pos_system
-JWT_SECRET=your_super_secret_jwt_key_here
-NODE_ENV=development
-```
+3. **Setup Database:**
+   ```bash
+   cd backend
+   npm run setup    # Create tables
+   npm run seed     # Add sample data
+   ```
 
-### 5. Start the Application
+### 4. Start the Application
 
 ```bash
 # Start all services (Backend, Admin Panel, POS Terminal)
@@ -103,7 +112,7 @@ This will start:
 ```
 pos_electron/
 ├── backend/                 # Node.js API Server
-│   ├── models/             # MongoDB models
+│   ├── models/             # MySQL models
 │   ├── routes/             # API routes
 │   ├── middleware/         # Custom middleware
 │   ├── config.js          # Configuration
@@ -237,7 +246,11 @@ cd backend && npm start
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://your-production-mongodb-url
+DB_HOST=your-production-mysql-host
+DB_PORT=3306
+DB_NAME=pos_system
+DB_USER=your-production-mysql-user
+DB_PASSWORD=your-production-mysql-password
 JWT_SECRET=your-production-jwt-secret
 NODE_ENV=production
 ```

@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const User = require('../models/User');
+const { User } = require('../models');
 const { auth } = require('../middleware/auth');
 const config = require('../config');
 
@@ -24,7 +24,9 @@ router.post('/register', [
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      where: {
+        [User.sequelize.Sequelize.Op.or]: [{ email }, { username }]
+      }
     });
 
     if (existingUser) {
@@ -32,12 +34,11 @@ router.post('/register', [
     }
 
     // Create new user
-    const user = new User({ username, email, password, role });
-    await user.save();
+    const user = await User.create({ username, email, password, role });
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user.id, role: user.role },
       config.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -46,7 +47,7 @@ router.post('/register', [
       message: 'User created successfully',
       token,
       user: {
-        id: user._id,
+        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role
@@ -76,8 +77,8 @@ router.post('/login', [
     console.log('Looking for user with email:', email);
 
     // Find user
-    const user = await User.findOne({ email, isActive: true });
-    console.log('User found:', user ? { id: user._id, email: user.email, isActive: user.isActive } : 'No user found');
+    const user = await User.findOne({ where: { email, isActive: true } });
+    console.log('User found:', user ? { id: user.id, email: user.email, isActive: user.isActive } : 'No user found');
     
     if (!user) {
       console.log('User not found or inactive');
@@ -95,7 +96,7 @@ router.post('/login', [
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user.id, role: user.role },
       config.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -105,7 +106,7 @@ router.post('/login', [
       message: 'Login successful',
       token,
       user: {
-        id: user._id,
+        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role
@@ -122,7 +123,7 @@ router.get('/me', auth, async (req, res) => {
   try {
     res.json({
       user: {
-        id: req.user._id,
+        id: req.user.id,
         username: req.user.username,
         email: req.user.email,
         role: req.user.role

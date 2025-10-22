@@ -188,7 +188,7 @@ function renderProducts(filteredProducts = products, searchTerm = '') {
         
         productCard.innerHTML = `
             <h3>${highlightedName}</h3>
-            <div class="product-price">$${product.price.toFixed(2)}</div>
+            <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
             <div class="product-stock">Stock: ${product.stock}</div>
             ${product.category ? `<div class="product-category">${product.category}</div>` : ''}
         `;
@@ -263,7 +263,7 @@ function clearSearch() {
 
 // Add product to cart
 function addToCart(product) {
-    const existingItem = cart.find(item => item.id === product._id);
+    const existingItem = cart.find(item => item.id === product.id);
     
     if (existingItem) {
         if (existingItem.quantity < product.stock) {
@@ -274,9 +274,9 @@ function addToCart(product) {
         }
     } else {
         cart.push({
-            id: product._id,
+            id: product.id,
             name: product.name,
-            price: product.price,
+            price: parseFloat(product.price),
             quantity: 1,
             stock: product.stock
         });
@@ -324,14 +324,14 @@ function renderCart() {
         cartItem.innerHTML = `
             <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)} each</div>
             </div>
             <div class="cart-item-controls">
                 <button class="quantity-btn" onclick="updateCartQuantity('${item.id}', ${item.quantity - 1})">-</button>
                 <span class="cart-item-quantity">${item.quantity}</span>
                 <button class="quantity-btn" onclick="updateCartQuantity('${item.id}', ${item.quantity + 1})">+</button>
             </div>
-            <div class="cart-item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+            <div class="cart-item-total">$${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
         `;
         cartItems.appendChild(cartItem);
     });
@@ -339,7 +339,7 @@ function renderCart() {
 
 // Update totals
 function updateTotals() {
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
     const tax = subtotal * 0.10; // 10% tax
     const total = subtotal + tax;
     

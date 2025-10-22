@@ -1,51 +1,67 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const productSchema = new mongoose.Schema({
+const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   name: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     trim: true
   },
   description: {
-    type: String,
+    type: DataTypes.TEXT,
+    allowNull: true,
     trim: true
   },
   price: {
-    type: Number,
-    required: true,
-    min: 0
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: {
+      min: 0
+    }
   },
   category: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     trim: true
   },
   stock: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+    validate: {
+      min: 0
+    }
   },
   barcode: {
-    type: String,
-    unique: true,
-    sparse: true
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
   },
   image: {
-    type: String,
-    default: ''
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: ''
   },
   isActive: {
-    type: Boolean,
-    default: true
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   }
 }, {
+  tableName: 'products',
   timestamps: true
 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = Product;
